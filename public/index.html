@@ -6,154 +6,188 @@
 <title>AI動画生成</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0a0a0f; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+body { background: #0a0a0f; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
 
-header { padding: 20px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #1e1e2e; }
+header { padding: 18px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #1a1a2e; }
 header h1 { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+header span { font-size: 12px; color: #475569; margin-left: auto; }
 
-.main { flex: 1; max-width: 780px; margin: 0 auto; width: 100%; padding: 40px 16px 80px; }
+.main { max-width: 800px; margin: 0 auto; padding: 32px 16px 80px; display: flex; flex-direction: column; gap: 16px; }
 
-/* API Key section */
-.key-section { background: #12121c; border: 1px solid #1e1e2e; border-radius: 14px; padding: 20px; margin-bottom: 24px; }
-.key-section h2 { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+.card { background: #12121c; border: 1px solid #1a1a2e; border-radius: 14px; padding: 20px; }
+.card-title { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+
+/* Provider tabs */
+.provider-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.ptab { padding: 10px 18px; border-radius: 10px; border: 1px solid #1a1a2e; background: transparent; color: #64748b; cursor: pointer; font-size: 14px; font-weight: 500; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+.ptab.active { background: #a78bfa18; border-color: #a78bfa; color: #c4b5fd; }
+.badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+.badge-free { background: #4ade8020; color: #4ade80; border: 1px solid #4ade8040; }
+.badge-paid { background: #fb923c18; color: #fb923c; border: 1px solid #fb923c30; }
+
+/* API key */
+.key-wrap { margin-top: 16px; }
+.key-label { font-size: 12px; color: #64748b; margin-bottom: 8px; display: block; }
 .key-row { display: flex; gap: 8px; }
-.key-row input { flex: 1; background: #0a0a0f; border: 1px solid #1e1e2e; border-radius: 8px; padding: 10px 14px; color: #e2e8f0; font-size: 14px; outline: none; }
-.key-row input:focus { border-color: #a78bfa; }
+input[type="password"], input[type="text"] { flex: 1; background: #0a0a0f; border: 1px solid #1a1a2e; border-radius: 8px; padding: 10px 14px; color: #e2e8f0; font-size: 14px; outline: none; transition: border-color .2s; }
+input:focus { border-color: #a78bfa; }
 .btn-save { padding: 10px 18px; background: #a78bfa; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; white-space: nowrap; }
 .btn-save:hover { background: #9061f9; }
-.key-hint { font-size: 12px; color: #475569; margin-top: 8px; }
+.saved-note { font-size: 12px; color: #4ade80; margin-top: 6px; display: none; }
+.key-hint { font-size: 12px; color: #334155; margin-top: 8px; line-height: 1.6; }
 .key-hint a { color: #60a5fa; text-decoration: none; }
-.key-saved { font-size: 12px; color: #4ade80; margin-top: 6px; display: none; }
 
-/* Prompt area */
-.prompt-card { background: #12121c; border: 1px solid #1e1e2e; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
-
-.model-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
-.model-tab { padding: 7px 14px; border-radius: 20px; border: 1px solid #1e1e2e; background: transparent; color: #64748b; cursor: pointer; font-size: 13px; transition: all .2s; }
-.model-tab.active { background: #a78bfa20; border-color: #a78bfa; color: #c4b5fd; }
-.badge { font-size: 10px; background: #4ade8020; color: #4ade80; border: 1px solid #4ade8040; border-radius: 4px; padding: 1px 5px; margin-left: 4px; font-weight: 700; }
-.badge-slow { background: #fb923c20; color: #fb923c; border-color: #fb923c40; }
-
-textarea.prompt { width: 100%; background: #0a0a0f; border: 1px solid #1e1e2e; border-radius: 10px; padding: 14px; color: #e2e8f0; font-size: 15px; outline: none; resize: none; min-height: 100px; line-height: 1.6; transition: border-color .2s; }
-textarea.prompt:focus { border-color: #a78bfa; }
-textarea.prompt::placeholder { color: #334155; }
+/* Prompt */
+textarea { width: 100%; background: #0a0a0f; border: 1px solid #1a1a2e; border-radius: 10px; padding: 14px; color: #e2e8f0; font-size: 15px; outline: none; resize: none; line-height: 1.7; transition: border-color .2s; }
+textarea:focus { border-color: #a78bfa; }
+textarea::placeholder { color: #2d2d42; }
 
 .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.preset { padding: 6px 12px; border-radius: 20px; border: 1px solid #1e1e2e; background: transparent; color: #64748b; cursor: pointer; font-size: 12px; transition: all .2s; }
-.preset:hover { border-color: #60a5fa; color: #93c5fd; }
+.preset { padding: 6px 12px; border-radius: 20px; border: 1px solid #1a1a2e; background: transparent; color: #475569; cursor: pointer; font-size: 12px; transition: all .2s; }
+.preset:hover { border-color: #a78bfa60; color: #a78bfa; }
 
 /* Options */
-.options { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
-.opt-group { display: flex; flex-direction: column; gap: 5px; }
-.opt-group label { font-size: 12px; color: #64748b; }
-select { background: #0a0a0f; border: 1px solid #1e1e2e; border-radius: 8px; padding: 7px 10px; color: #e2e8f0; font-size: 13px; outline: none; cursor: pointer; }
+.opts { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+.opt { display: flex; flex-direction: column; gap: 5px; }
+.opt label { font-size: 12px; color: #475569; }
+select { background: #0a0a0f; border: 1px solid #1a1a2e; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; cursor: pointer; }
 select:focus { border-color: #a78bfa; }
 
+/* Model sub-tabs (fal.ai) */
+.model-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+.mtab { padding: 6px 14px; border-radius: 20px; border: 1px solid #1a1a2e; background: transparent; color: #475569; cursor: pointer; font-size: 12px; transition: all .2s; }
+.mtab.active { background: #60a5fa18; border-color: #60a5fa; color: #93c5fd; }
+
 /* Generate button */
-.gen-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #a78bfa, #60a5fa); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-top: 16px; }
+.gen-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #a78bfa, #60a5fa); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
 .gen-btn:hover { opacity: .9; }
-.gen-btn:disabled { opacity: .4; cursor: not-allowed; }
+.gen-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* Error */
+.error-box { background: #ef444414; border: 1px solid #ef444460; border-radius: 10px; padding: 14px 16px; color: #fca5a5; font-size: 13px; display: none; line-height: 1.7; white-space: pre-wrap; }
 
 /* Progress */
-.progress-card { background: #12121c; border: 1px solid #1e1e2e; border-radius: 14px; padding: 24px; display: none; text-align: center; }
-.progress-card h2 { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
-.bar-wrap { background: #0a0a0f; border-radius: 99px; height: 6px; overflow: hidden; margin-bottom: 10px; }
+.progress-card { text-align: center; }
+.bar-wrap { background: #0a0a0f; border-radius: 99px; height: 6px; overflow: hidden; margin: 14px 0 10px; }
 .bar { height: 100%; background: linear-gradient(90deg, #a78bfa, #60a5fa); border-radius: 99px; width: 0%; transition: width .5s; }
-.progress-msg { font-size: 13px; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.spinner { width: 14px; height: 14px; border: 2px solid #1e1e2e; border-top-color: #a78bfa; border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0; }
+.prog-msg { font-size: 13px; color: #475569; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.spinner { width: 14px; height: 14px; border: 2px solid #1a1a2e; border-top-color: #a78bfa; border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Result */
-.result-card { background: #12121c; border: 1px solid #1e1e2e; border-radius: 14px; padding: 20px; display: none; }
-.result-card h2 { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
-.result-card video { width: 100%; border-radius: 8px; background: #000; max-height: 480px; }
+.result-card video { width: 100%; border-radius: 8px; background: #000; max-height: 500px; }
 .result-actions { display: flex; gap: 10px; margin-top: 12px; }
-.btn-dl { flex: 1; padding: 11px; background: #1e1e2e; border: 1px solid #2d2d3d; border-radius: 8px; color: #e2e8f0; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; }
+.btn-dl { flex: 1; padding: 12px; background: #1a1a2e; border: 1px solid #2a2a3e; border-radius: 8px; color: #e2e8f0; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; }
 .btn-dl:hover { border-color: #a78bfa; color: #a78bfa; }
-.btn-new { flex: 1; padding: 11px; background: #a78bfa20; border: 1px solid #a78bfa; border-radius: 8px; color: #a78bfa; cursor: pointer; font-size: 14px; font-weight: 600; }
-
-/* Error */
-.error-box { background: #ef444418; border: 1px solid #ef4444; border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; display: none; margin-bottom: 12px; line-height: 1.6; }
+.btn-new { flex: 1; padding: 12px; background: #a78bfa18; border: 1px solid #a78bfa; border-radius: 8px; color: #a78bfa; cursor: pointer; font-size: 14px; font-weight: 600; }
 
 /* History */
-.history-section { margin-top: 32px; }
-.history-section h2 { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
-.history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-.history-item { background: #12121c; border: 1px solid #1e1e2e; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color .2s; }
+.history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 10px; }
+.history-item { background: #0a0a0f; border: 1px solid #1a1a2e; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color .2s; }
 .history-item:hover { border-color: #a78bfa; }
 .history-item video { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #000; display: block; }
-.history-item p { padding: 8px 10px; font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-item p { padding: 7px 9px; font-size: 11px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-@media (max-width: 600px) {
-  .options { flex-direction: column; }
-  .result-actions { flex-direction: column; }
-}
+@media (max-width: 600px) { .opts { flex-direction: column; } .result-actions { flex-direction: column; } }
 </style>
 </head>
 <body>
-
 <header>
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#g)"/><polygon points="8,20 14,8 20,20 17,20 14,14 11,20" fill="white"/><defs><linearGradient id="g" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#60a5fa"/></linearGradient></defs></svg>
+  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect width="26" height="26" rx="8" fill="url(#hg)"/><polygon points="7,19 13,7 19,19 16,19 13,13 10,19" fill="white"/><defs><linearGradient id="hg" x1="0" y1="0" x2="26" y2="26"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#60a5fa"/></linearGradient></defs></svg>
   <h1>AI動画生成</h1>
+  <span>テキスト → 動画</span>
 </header>
 
 <div class="main">
 
-  <!-- API Key -->
-  <div class="key-section">
-    <h2>APIキー</h2>
-    <div class="key-row">
-      <input type="password" id="apiKeyInput" placeholder="fal.ai APIキー（xxxxxxxx-xxxx:xxxxxxxx）" autocomplete="off">
-      <button class="btn-save" onclick="saveKey()">保存</button>
+  <!-- Provider & API Key -->
+  <div class="card">
+    <div class="card-title">サービス選択</div>
+    <div class="provider-tabs">
+      <button class="ptab active" onclick="setProvider('gemini')" id="ptab-gemini">
+        ✦ Gemini / Veo 2 <span class="badge badge-free">完全無料</span>
+      </button>
+      <button class="ptab" onclick="setProvider('fal')" id="ptab-fal">
+        ⚡ fal.ai <span class="badge badge-paid">有料</span>
+      </button>
     </div>
-    <div class="key-saved" id="keySaved">✓ 保存しました</div>
-    <div class="key-hint">
-      無料: <a href="https://fal.ai" target="_blank">fal.ai</a> でサインアップ → Dashboard → API Keys（$10クレジット付き・カード不要）
+
+    <div class="key-wrap">
+      <span class="key-label" id="keyLabel">Google AI Studio APIキー</span>
+      <div class="key-row">
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+        <button class="btn-save" onclick="saveKey()">保存</button>
+      </div>
+      <div class="saved-note" id="savedNote">✓ 保存しました</div>
+      <div class="key-hint" id="keyHint">
+        無料取得: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
+        → 「APIキーを作成」（Googleアカウントのみ・カード不要）
+      </div>
     </div>
   </div>
 
   <!-- Error -->
   <div class="error-box" id="errorBox"></div>
 
-  <!-- Prompt -->
-  <div class="prompt-card">
-    <div class="model-tabs">
-      <button class="model-tab active" onclick="setModel('animatediff')" id="tab-animatediff">AnimateDiff <span class="badge">高速・無料</span></button>
-      <button class="model-tab" onclick="setModel('hunyuan')" id="tab-hunyuan">HunyuanVideo <span class="badge badge-slow">高品質</span></button>
-      <button class="model-tab" onclick="setModel('wan')" id="tab-wan">Wan 2.1 <span class="badge badge-slow">高品質</span></button>
-    </div>
-
-    <textarea class="prompt" id="promptInput" placeholder="例: A woman walks through a neon-lit Tokyo street at night, cinematic, 4K..." rows="4"></textarea>
+  <!-- Prompt & Options -->
+  <div class="card">
+    <div class="card-title">プロンプト</div>
+    <textarea id="promptInput" rows="4" placeholder="例: A young woman walks through a glowing Tokyo street at night, cinematic 4K, slow motion..."></textarea>
 
     <div class="presets">
-      <button class="preset" onclick="addPreset('cinematic lighting, 4K, ultra realistic')">🎬 シネマ</button>
-      <button class="preset" onclick="addPreset('anime style, colorful, dynamic')">✨ アニメ</button>
-      <button class="preset" onclick="addPreset('slow motion, dramatic, epic')">🎭 ドラマチック</button>
-      <button class="preset" onclick="addPreset('nature, peaceful, time-lapse')">🌿 自然</button>
-      <button class="preset" onclick="addPreset('futuristic, cyberpunk, neon lights')">🤖 サイバーパンク</button>
-      <button class="preset" onclick="addPreset('underwater, ocean, blue tones')">🌊 海中</button>
-      <button class="preset" onclick="addPreset('fantasy, magical, glowing particles')">🔮 ファンタジー</button>
-      <button class="preset" onclick="addPreset('street photography, urban, bokeh')">🏙️ 都市</button>
+      <button class="preset" onclick="ap('cinematic lighting, 4K, photorealistic')">🎬 シネマ</button>
+      <button class="preset" onclick="ap('anime style, vibrant colors, dynamic camera')">✨ アニメ</button>
+      <button class="preset" onclick="ap('slow motion, dramatic, epic music feel')">🎭 スロー</button>
+      <button class="preset" onclick="ap('nature scenery, peaceful, golden hour')">🌿 自然</button>
+      <button class="preset" onclick="ap('cyberpunk city, neon lights, rain, night')">🤖 サイバーパンク</button>
+      <button class="preset" onclick="ap('underwater ocean, blue tones, coral reef')">🌊 海中</button>
+      <button class="preset" onclick="ap('fantasy world, magical particles, epic')">🔮 ファンタジー</button>
+      <button class="preset" onclick="ap('aerial drone shot, landscape, sunrise')">🚁 空撮</button>
     </div>
 
-    <div class="options" id="optionsArea">
-      <div class="opt-group" id="durationGroup">
+    <!-- Gemini options -->
+    <div id="geminiOpts" class="opts">
+      <div class="opt">
         <label>尺</label>
-        <select id="durationSelect">
-          <option value="2">2秒</option>
-          <option value="4" selected>4秒</option>
-          <option value="6">6秒</option>
-          <option value="8">8秒</option>
+        <select id="geminiDuration">
+          <option value="5">5秒</option>
+          <option value="8" selected>8秒</option>
         </select>
       </div>
-      <div class="opt-group" id="resolutionGroup">
-        <label>解像度</label>
-        <select id="resolutionSelect">
-          <option value="512x512">512×512（正方形）</option>
-          <option value="512x288">512×288（横長）</option>
-          <option value="288x512">288×512（縦長）</option>
-          <option value="768x512" selected>768×512（ワイド）</option>
+      <div class="opt">
+        <label>アスペクト比</label>
+        <select id="geminiRatio">
+          <option value="16:9" selected>16:9（横長）</option>
+          <option value="9:16">9:16（縦長・TikTok）</option>
+          <option value="1:1">1:1（正方形）</option>
         </select>
+      </div>
+    </div>
+
+    <!-- fal.ai options -->
+    <div id="falOpts" style="display:none;">
+      <div class="model-tabs">
+        <button class="mtab active" onclick="setFalModel('animatediff')" id="mtab-animatediff">AnimateDiff <span style="font-size:10px;color:#4ade80;">高速</span></button>
+        <button class="mtab" onclick="setFalModel('hunyuan')" id="mtab-hunyuan">HunyuanVideo</button>
+        <button class="mtab" onclick="setFalModel('wan')" id="mtab-wan">Wan 2.1</button>
+      </div>
+      <div class="opts" style="margin-top:14px;">
+        <div class="opt">
+          <label>尺</label>
+          <select id="falDuration">
+            <option value="2">2秒</option>
+            <option value="4" selected>4秒</option>
+            <option value="6">6秒</option>
+          </select>
+        </div>
+        <div class="opt">
+          <label>解像度</label>
+          <select id="falResolution">
+            <option value="512x512">512×512</option>
+            <option value="768x512" selected>768×512</option>
+            <option value="512x288">512×288</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -161,109 +195,129 @@ select:focus { border-color: #a78bfa; }
   </div>
 
   <!-- Progress -->
-  <div class="progress-card" id="progressCard">
-    <h2>生成中...</h2>
+  <div class="card progress-card" id="progressCard" style="display:none;">
+    <div class="card-title">生成中...</div>
     <div class="bar-wrap"><div class="bar" id="progressBar"></div></div>
-    <div class="progress-msg"><span class="spinner"></span><span id="progressMsg">処理中...</span></div>
+    <div class="prog-msg"><span class="spinner"></span><span id="progressMsg">処理中...</span></div>
   </div>
 
   <!-- Result -->
-  <div class="result-card" id="resultCard">
-    <h2>完成！</h2>
+  <div class="card result-card" id="resultCard" style="display:none;">
+    <div class="card-title">完成！</div>
     <video id="resultVideo" controls loop playsinline autoplay></video>
     <div class="result-actions">
-      <button class="btn-dl" onclick="download()">⬇ ダウンロード</button>
-      <button class="btn-new" onclick="reset()">＋ 新しく作る</button>
+      <button class="btn-dl" onclick="dlVideo()">⬇ ダウンロード</button>
+      <button class="btn-new" onclick="resetUI()">＋ 新しく作る</button>
     </div>
   </div>
 
   <!-- History -->
-  <div class="history-section" id="historySection" style="display:none;">
-    <h2>生成履歴</h2>
+  <div id="historySection" style="display:none;">
+    <div class="card-title" style="padding:0 4px 10px;">生成履歴</div>
     <div class="history-grid" id="historyGrid"></div>
   </div>
 
 </div>
 
 <script>
-let model = 'animatediff';
+let provider = 'gemini';
+let falModel = 'animatediff';
 let pollTimer = null;
 let currentVideoUrl = null;
 const history = [];
 
-// Init
 window.addEventListener('load', () => {
-  const k = localStorage.getItem('apiKey_fal') || '';
-  document.getElementById('apiKeyInput').value = k;
+  document.getElementById('apiKeyInput').value = localStorage.getItem('apiKey_gemini') || '';
 });
+
+// ── Provider ──────────────────────────────────────────────────────────
+function setProvider(p) {
+  provider = p;
+  ['gemini','fal'].forEach(id => document.getElementById('ptab-'+id).classList.remove('active'));
+  document.getElementById('ptab-'+p).classList.add('active');
+
+  const isGemini = p === 'gemini';
+  document.getElementById('geminiOpts').style.display = isGemini ? 'flex' : 'none';
+  document.getElementById('falOpts').style.display   = isGemini ? 'none' : 'block';
+
+  if (isGemini) {
+    document.getElementById('keyLabel').textContent = 'Google AI Studio APIキー';
+    document.getElementById('apiKeyInput').placeholder = 'AIzaSy...';
+    document.getElementById('keyHint').innerHTML = '無料取得: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> → 「APIキーを作成」（Googleアカウントのみ・カード不要）';
+  } else {
+    document.getElementById('keyLabel').textContent = 'fal.ai APIキー';
+    document.getElementById('apiKeyInput').placeholder = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:xxxxxxxx';
+    document.getElementById('keyHint').innerHTML = '取得: <a href="https://fal.ai/dashboard/keys" target="_blank">fal.ai/dashboard/keys</a>（$10無料クレジット付き）';
+  }
+  document.getElementById('apiKeyInput').value = localStorage.getItem(`apiKey_${p}`) || '';
+}
+
+function setFalModel(m) {
+  falModel = m;
+  ['animatediff','hunyuan','wan'].forEach(id => document.getElementById('mtab-'+id).classList.remove('active'));
+  document.getElementById('mtab-'+m).classList.add('active');
+}
 
 function saveKey() {
   const k = document.getElementById('apiKeyInput').value.trim();
-  localStorage.setItem('apiKey_fal', k);
-  const el = document.getElementById('keySaved');
+  localStorage.setItem(`apiKey_${provider}`, k);
+  const el = document.getElementById('savedNote');
   el.style.display = 'block';
   setTimeout(() => el.style.display = 'none', 2000);
 }
 
-function setModel(m) {
-  model = m;
-  ['animatediff','hunyuan','wan'].forEach(id => document.getElementById('tab-'+id).classList.remove('active'));
-  document.getElementById('tab-'+m).classList.add('active');
-
-  // HunyuanとWanは解像度オプションを変更
-  const resSel = document.getElementById('resolutionSelect');
-  if (m === 'hunyuan') {
-    resSel.innerHTML = `
-      <option value="720p">720p（HD）</option>
-      <option value="1080p" selected>1080p（Full HD）</option>
-    `;
-  } else if (m === 'wan') {
-    resSel.innerHTML = `
-      <option value="480p">480p</option>
-      <option value="720p" selected>720p（HD）</option>
-    `;
-  } else {
-    resSel.innerHTML = `
-      <option value="512x512">512×512（正方形）</option>
-      <option value="512x288">512×288（横長）</option>
-      <option value="288x512">288×512（縦長）</option>
-      <option value="768x512" selected>768×512（ワイド）</option>
-    `;
-  }
-}
-
-function addPreset(text) {
+function ap(text) {
   const ta = document.getElementById('promptInput');
-  const cur = ta.value.trim();
-  ta.value = cur ? cur + ', ' + text : text;
+  ta.value = ta.value.trim() ? ta.value.trim() + ', ' + text : text;
   ta.focus();
 }
 
+// ── Generate ─────────────────────────────────────────────────────────
 async function generate() {
-  const apiKey = (localStorage.getItem('apiKey_fal') || document.getElementById('apiKeyInput').value || '').trim();
+  const apiKey = (localStorage.getItem(`apiKey_${provider}`) || document.getElementById('apiKeyInput').value || '').trim();
   const prompt = document.getElementById('promptInput').value.trim();
 
-  if (!apiKey) { showError('fal.aiのAPIキーを入力して「保存」を押してください\nfal.ai → Dashboard → API Keys で取得できます'); return; }
-  if (!apiKey.includes(':')) { showError('APIキーの形式が違います。\nfal.ai/dashboard/keys から取得した「xxxx:xxxx」形式のキーを使ってください'); return; }
-  if (!prompt) { showError('プロンプト（動画の内容）を入力してください'); return; }
+  if (!apiKey) {
+    const hint = provider === 'gemini'
+      ? 'Google AI Studio（aistudio.google.com/apikey）でAPIキーを取得してください（無料）'
+      : 'fal.ai（fal.ai/dashboard/keys）でAPIキーを取得してください';
+    showError('APIキーが入力されていません。\n' + hint);
+    return;
+  }
+  if (!prompt) { showError('動画の内容を入力してください'); return; }
 
   hideError();
   document.getElementById('genBtn').disabled = true;
   document.getElementById('resultCard').style.display = 'none';
   showProgress(5, 'リクエスト送信中...');
 
-  const duration = document.getElementById('durationSelect').value;
-  const resolution = document.getElementById('resolutionSelect').value;
-
   try {
-    const res = await fetch('/api/generate', {
+    let body, endpoint;
+    if (provider === 'gemini') {
+      endpoint = '/api/generate/gemini';
+      body = {
+        apiKey, prompt,
+        duration: document.getElementById('geminiDuration').value,
+        aspectRatio: document.getElementById('geminiRatio').value,
+      };
+    } else {
+      endpoint = '/api/generate/fal';
+      body = {
+        apiKey, prompt, model: falModel,
+        duration: document.getElementById('falDuration').value,
+        resolution: document.getElementById('falResolution').value,
+      };
+    }
+
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey, prompt, model, duration, resolution }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     if (!res.ok || data.error) throw new Error(data.error || '生成リクエスト失敗');
-    showProgress(10, 'タスク受付完了。生成中...');
+
+    showProgress(10, '生成キューに入りました...');
     pollStatus(data.taskId, apiKey);
   } catch (err) {
     hideProgress();
@@ -274,19 +328,28 @@ async function generate() {
 
 function pollStatus(taskId, apiKey) {
   let attempts = 0;
+  const statusEndpoint = provider === 'gemini'
+    ? `/api/status/gemini/${encodeURIComponent(taskId)}?apiKey=${encodeURIComponent(apiKey)}`
+    : `/api/status/fal/${taskId}?apiKey=${encodeURIComponent(apiKey)}&model=${falModel}`;
+
   pollTimer = setInterval(async () => {
-    if (++attempts > 180) {
+    if (++attempts > 200) {
       clearInterval(pollTimer);
       hideProgress();
-      showError('タイムアウトしました。再試行してください。');
+      showError('タイムアウト。再試行してください。');
       document.getElementById('genBtn').disabled = false;
       return;
     }
     try {
-      const res = await fetch(`/api/status/${taskId}?apiKey=${encodeURIComponent(apiKey)}&model=${model}`);
+      const res = await fetch(statusEndpoint);
       const data = await res.json();
-      const pct = data.progress || Math.min(attempts * 0.8, 90);
-      const msgs = { PENDING: `待機中... (キュー${data.queuePos ?? ''})`, RUNNING: '動画を生成中...', SUCCEEDED: '完成！', FAILED: '失敗' };
+      const pct = data.progress || Math.min(10 + attempts * 0.5, 90);
+      const msgs = {
+        PENDING: `待機中... (キュー位置: ${data.queuePos ?? '?'})`,
+        RUNNING: '動画を生成中...',
+        SUCCEEDED: '完成！',
+        FAILED: '失敗',
+      };
       showProgress(pct, msgs[data.status] || '処理中...');
 
       if (data.status === 'SUCCEEDED' && data.videoUrl) {
@@ -305,7 +368,7 @@ function pollStatus(taskId, apiKey) {
         document.getElementById('genBtn').disabled = false;
       }
     } catch (_) {}
-  }, 2000);
+  }, 3000);
 }
 
 function showResult(url) {
@@ -314,16 +377,12 @@ function showResult(url) {
   document.getElementById('resultCard').style.display = 'block';
   document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
 }
-
-function download() {
+function dlVideo() {
   if (!currentVideoUrl) return;
   const a = document.createElement('a');
-  a.href = currentVideoUrl;
-  a.download = `ai-video-${Date.now()}.mp4`;
-  a.click();
+  a.href = currentVideoUrl; a.download = `ai-video-${Date.now()}.mp4`; a.click();
 }
-
-function reset() {
+function resetUI() {
   document.getElementById('resultCard').style.display = 'none';
   document.getElementById('resultVideo').src = '';
   currentVideoUrl = null;
@@ -334,20 +393,14 @@ function reset() {
 function addHistory(url, prompt) {
   history.unshift({ url, prompt });
   if (history.length > 12) history.pop();
-  renderHistory();
-}
-
-function renderHistory() {
   const section = document.getElementById('historySection');
   const grid = document.getElementById('historyGrid');
-  if (!history.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  grid.innerHTML = history.map((item, i) => `
+  grid.innerHTML = history.map(item => `
     <div class="history-item" onclick="showResult('${item.url}')">
       <video src="${item.url}" muted playsinline preload="metadata"></video>
       <p>${item.prompt}</p>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function showProgress(pct, msg) {
@@ -357,10 +410,9 @@ function showProgress(pct, msg) {
 }
 function hideProgress() { document.getElementById('progressCard').style.display = 'none'; }
 function showError(msg) {
-  const box = document.getElementById('errorBox');
-  box.textContent = '⚠ ' + msg;
-  box.style.display = 'block';
-  box.scrollIntoView({ behavior: 'smooth' });
+  const b = document.getElementById('errorBox');
+  b.textContent = '⚠ ' + msg; b.style.display = 'block';
+  b.scrollIntoView({ behavior: 'smooth' });
 }
 function hideError() { document.getElementById('errorBox').style.display = 'none'; }
 </script>
