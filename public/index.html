@@ -329,7 +329,7 @@ async function generate() {
 function pollStatus(taskId, apiKey) {
   let attempts = 0;
   const statusEndpoint = provider === 'gemini'
-    ? `/api/status/gemini/${encodeURIComponent(taskId)}?apiKey=${encodeURIComponent(apiKey)}`
+    ? `/api/status/gemini?taskId=${encodeURIComponent(taskId)}&apiKey=${encodeURIComponent(apiKey)}`
     : `/api/status/fal/${taskId}?apiKey=${encodeURIComponent(apiKey)}&model=${falModel}`;
 
   pollTimer = setInterval(async () => {

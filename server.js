@@ -49,10 +49,9 @@ app.post('/api/generate/gemini', async (req, res) => {
   }
 });
 
-app.get('/api/status/gemini/:taskId(*)', async (req, res) => {
+app.get('/api/status/gemini', async (req, res) => {
   try {
-    const taskId = req.params.taskId; // "operations/xxxxx"
-    const { apiKey: rawKey } = req.query;
+    const { taskId, apiKey: rawKey } = req.query;
     const apiKey = (rawKey || '').trim();
 
     const response = await axios.get(
